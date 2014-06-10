@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>IDESourceControlProjectFavoriteDictionaryKey</key>
+	<false/>
+	<key>IDESourceControlProjectIdentifier</key>
+	<string>D309F9B8-6C0A-48A0-8979-80BD164D84BF</string>
+	<key>IDESourceControlProjectName</key>
+	<string>BMATCH IOS</string>
+	<key>IDESourceControlProjectOriginsDictionary</key>
+	<dict>
+		<key>3935E3E8-70A9-433D-A082-DC554334FEFA</key>
+		<string>https://github.com/mcangel182/BMATCH.git</string>
+	</dict>
+	<key>IDESourceControlProjectPath</key>
+	<string>BMATCH IOS.xcodeproj/project.xcworkspace</string>
+	<key>IDESourceControlProjectRelativeInstallPathDictionary</key>
+	<dict>
+		<key>3935E3E8-70A9-433D-A082-DC554334FEFA</key>
+		<string>../..</string>
+	</dict>
+	<key>IDESourceControlProjectURL</key>
+	<string>https://github.com/mcangel182/BMATCH.git</string>
+	<key>IDESourceControlProjectVersion</key>
+	<integer>110</integer>
+	<key>IDESourceControlProjectWCCIdentifier</key>
+	<string>3935E3E8-70A9-433D-A082-DC554334FEFA</string>
+	<key>IDESourceControlProjectWCConfigurations</key>
+	<array>
+		<dict>
+			<key>IDESourceControlRepositoryExtensionIdentifierKey</key>
+			<string>public.vcs.git</string>
+			<key>IDESourceControlWCCIdentifierKey</key>
+			<string>3935E3E8-70A9-433D-A082-DC554334FEFA</string>
+			<key>IDESourceControlWCCName</key>
+			<string>BMATCH</string>
+		</dict>
+	</array>
+</dict>
+</plist>
