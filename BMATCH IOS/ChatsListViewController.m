@@ -128,6 +128,7 @@
     ChatViewController *destViewController = segue.destinationViewController;
     [destViewController setChatToMe:_selectedChatToMe];
     [destViewController setChatFromMe:_selectedChatFromMe];
+    [destViewController setChatUser:_selectedChatToMe[@"from"]];
 }
 
 // Override to support conditional editing of the table view.

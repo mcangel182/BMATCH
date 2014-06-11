@@ -30,10 +30,11 @@
 }
 
 - (IBAction)registration:(id)sender {
+    NSLog(@"goToRegistration");
     [self performSegueWithIdentifier: @"goToRegistration" sender:sender];
 }
 - (IBAction)login:(id)sender {
-    
+    NSLog(@"HELLOOOO!!!");
     //con log in de parse
     [PFUser logInWithUsernameInBackground:_username.text password:_password.text
                                     block:^(PFUser *user, NSError *error) {
@@ -50,9 +51,14 @@
                                     }];
     
     PFInstallation *currentInstallation = [PFInstallation currentInstallation];
-    [currentInstallation removeObjectForKey:@"channels"];
+    if (currentInstallation.channels.lastObject) {
+        NSString *lastLogedInUser = currentInstallation.channels[0];
+        [currentInstallation removeObject:lastLogedInUser forKey:@"channels"];
+        [currentInstallation save];
+        currentInstallation = [PFInstallation currentInstallation];
+    }
     [currentInstallation addUniqueObject:[PFUser currentUser].objectId forKey:@"channels"];
-    [currentInstallation saveInBackground];
+    [currentInstallation save];
 }
 
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil

@@ -7,7 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		413969041947B68300645494 /* Parse.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 413969031947B68300645494 /* Parse.framework */; };
+		04ACF7A41947B83F0030F869 /* Parse.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 04ACF7A31947B83F0030F869 /* Parse.framework */; };
 		413A84261943856F00E564BC /* ChatsListViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 413A84251943856F00E564BC /* ChatsListViewController.m */; };
 		413A84291943C28400E564BC /* ProfileViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 413A84281943C28400E564BC /* ProfileViewController.m */; };
 		413A842B1943DA1800E564BC /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 413A842A1943DA1800E564BC /* AVFoundation.framework */; };
@@ -57,7 +57,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		413969031947B68300645494 /* Parse.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Parse.framework; sourceTree = "<group>"; };
+		04ACF7A31947B83F0030F869 /* Parse.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Parse.framework; sourceTree = "<group>"; };
 		413A84241943856F00E564BC /* ChatsListViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ChatsListViewController.h; sourceTree = "<group>"; };
 		413A84251943856F00E564BC /* ChatsListViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ChatsListViewController.m; sourceTree = "<group>"; };
 		413A84271943C28400E564BC /* ProfileViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ProfileViewController.h; sourceTree = "<group>"; };
@@ -129,7 +129,7 @@
 				413D1B82193ACDAF00CC15B8 /* CoreLocation.framework in Frameworks */,
 				416BB9F1193971F700A797A6 /* CoreGraphics.framework in Frameworks */,
 				413D1B80193ACD9800CC15B8 /* CFNetwork.framework in Frameworks */,
-				413969041947B68300645494 /* Parse.framework in Frameworks */,
+				04ACF7A41947B83F0030F869 /* Parse.framework in Frameworks */,
 				413D1B7E193ACD8C00CC15B8 /* AudioToolbox.framework in Frameworks */,
 				416BB9F3193971F700A797A6 /* UIKit.framework in Frameworks */,
 				416BB9EF193971F700A797A6 /* Foundation.framework in Frameworks */,
@@ -171,7 +171,7 @@
 		416BB9ED193971F700A797A6 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				413969031947B68300645494 /* Parse.framework */,
+				04ACF7A31947B83F0030F869 /* Parse.framework */,
 				413A842A1943DA1800E564BC /* AVFoundation.framework */,
 				413D1B8D193ACE2600CC15B8 /* SystemConfiguration.framework */,
 				413D1B8B193ACDF800CC15B8 /* StoreKit.framework */,
@@ -513,6 +513,7 @@
 					"/Users/MariaCamila/Documents/Proyectos\\ XCODE/BMATCH\\ IOS",
 					/Users/MariaCamila/Documents/ProyectosXCODE/BMATCH_IOS,
 					/Users/MariaCamila/Documents/ProyectosXCODE/BMATCH,
+					/Users/Maca/Documents/BMATCH/IOS_APP/BMATCH,
 				);
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "BMATCH IOS/BMATCH IOS-Prefix.pch";
@@ -535,6 +536,7 @@
 					"/Users/MariaCamila/Documents/Proyectos\\ XCODE/BMATCH\\ IOS",
 					/Users/MariaCamila/Documents/ProyectosXCODE/BMATCH_IOS,
 					/Users/MariaCamila/Documents/ProyectosXCODE/BMATCH,
+					/Users/Maca/Documents/BMATCH/IOS_APP/BMATCH,
 				);
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "BMATCH IOS/BMATCH IOS-Prefix.pch";

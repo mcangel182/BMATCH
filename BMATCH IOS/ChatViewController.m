@@ -27,6 +27,7 @@
 
 @property (strong, nonatomic) PFObject* chatToMe;
 @property (strong, nonatomic) PFObject* chatFromMe;
+@property (strong, nonatomic) PFObject* chatUser;
 
 @end
 
@@ -34,6 +35,7 @@
 
 @synthesize chatToMe = _chatToMe;
 @synthesize chatFromMe = _chatFromMe;
+@synthesize chatUser = _chatUser;
 
 
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
@@ -180,6 +182,22 @@
     [bubbleData addObject:sayBubble];
     [bubbleTable reloadData];
     
+    PFUser *currentUser = [PFUser currentUser];
+    NSString *alert = currentUser[@"name"];
+    alert = [alert stringByAppendingString:@" "];
+    alert = [alert stringByAppendingString:currentUser[@"lastName"]];
+    alert = [alert stringByAppendingString:@": "];
+    alert = [alert stringByAppendingString:textField.text];
+
+    NSDictionary *data = [NSDictionary dictionaryWithObjectsAndKeys:
+                          alert, @"alert",
+                          @"Increment", @"badge",
+                          nil];
+    PFPush *push = [[PFPush alloc] init];
+    [push setChannel:_chatUser.objectId];
+    [push setData:data];
+    [push sendPushInBackground];
+    
     textField.text = @"";
     [textField resignFirstResponder];
 }
@@ -194,6 +212,11 @@
     _chatFromMe = chat;
     NSLog(@"Chat from me %@", chat.objectId);
     
+}
+     
+-(void) setChatUser:(PFObject *)chatUser{
+    _chatUser = chatUser;
+    NSLog(@"Chat user %@", chatUser.objectId);
 }
 
 @end

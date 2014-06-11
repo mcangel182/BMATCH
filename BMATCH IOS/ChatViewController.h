@@ -13,4 +13,5 @@
 @interface ChatViewController : UIViewController <UIBubbleTableViewDataSource>
     -(void)setChatToMe:(PFObject *)chat;
     -(void)setChatFromMe:(PFObject *)chat;
+    -(void) setChatUser:(PFObject *)chatUser;
 @end

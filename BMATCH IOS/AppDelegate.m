@@ -20,8 +20,14 @@
      UIRemoteNotificationTypeAlert|
      UIRemoteNotificationTypeSound];
     [PFAnalytics trackAppOpenedWithLaunchOptions:launchOptions];
-
     //parse
+    
+    
+    // Extract the notification data
+    //NSDictionary *notificationPayload = launchOptions[UIApplicationLaunchOptionsRemoteNotificationKey];
+    
+    // Create a pointer to the Photo object
+    //NSString *newMessage = [notificationPayload objectForKey:@"alert"];
     
     return YES;
 }

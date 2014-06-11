@@ -162,6 +162,7 @@
     ChatViewController *destViewController = segue.destinationViewController;
     [destViewController setChatToMe:_selectedChatToMe];
     [destViewController setChatFromMe:_selectedChatFromMe];
+    [destViewController setChatUser:_selectedChatToMe[@"from"]];
 }
 
 -(BOOL)searchDisplayController:(UISearchDisplayController *)controller shouldReloadTableForSearchString:(NSString *)searchString
