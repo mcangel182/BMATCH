@@ -13,16 +13,16 @@
 @interface UsersListViewController ()
 @property NSMutableArray *users;
 @property NSArray *searchResults;
-@property (strong, nonatomic) PFObject* selectedChatToMe;
-@property (strong, nonatomic) PFObject* selectedChatFromMe;
+@property (strong, nonatomic) PFObject* selectedChat;
+@property (strong, nonatomic) PFObject* selectedChatUser;
 @property (strong, nonatomic) PFObject* event;
 
 @end
 
 @implementation UsersListViewController
 
-@synthesize selectedChatFromMe = _selectedChatFromMe;
-@synthesize selectedChatToMe = _selectedChatToMe;
+@synthesize selectedChat = _selectedChat;
+@synthesize selectedChatUser = _selectedChatUser;
 @synthesize event = _event;
 
 - (void)loadEventUsers {
@@ -111,47 +111,27 @@
 {
     [tableView deselectRowAtIndexPath:indexPath animated:NO];
     PFObject *selectedEventUser = [self.users objectAtIndex:indexPath.row];
-    PFUser *selectedUser = selectedEventUser[@"user"];
-    NSLog(@"\ntapped item: %@", selectedUser.objectId);
+    _selectedChatUser = selectedEventUser[@"user"];
+    NSLog(@"\ntapped item: %@", _selectedChatUser.objectId);
+    
+    NSArray *users = [[NSArray alloc] initWithObjects:[PFUser currentUser],_selectedChatUser, nil];
     
     PFQuery *queryChat = [PFQuery queryWithClassName:@"Chat"];
-    [queryChat whereKey:@"from" equalTo:[PFUser currentUser]];
-    [queryChat whereKey:@"to" equalTo:selectedUser];
-    _selectedChatFromMe = [queryChat getFirstObject];
+    [queryChat whereKey:@"user1" containedIn:users];
+    [queryChat whereKey:@"user2" containedIn:users];
+    _selectedChat = [queryChat getFirstObject];
     
-    PFQuery *queryChat2 = [PFQuery queryWithClassName:@"Chat"];
-    [queryChat2 whereKey:@"to" equalTo:[PFUser currentUser]];
-    [queryChat2 whereKey:@"from" equalTo:selectedUser];
-    _selectedChatToMe = [queryChat2 getFirstObject];
-    
-    if (!_selectedChatToMe) {
+    if (!_selectedChat) {
         //si el chat no ha sido inicializado por alguno de los dos usuarios se crea
         PFObject *chat = [PFObject objectWithClassName:@"Chat"];
-        chat[@"to"] = [PFUser currentUser];
-        chat[@"from"] = selectedUser;
+        chat[@"user1"] = [PFUser currentUser];
+        chat[@"user2"] = _selectedChatUser;
         chat[@"event"] = _event;
-        chat[@"active"] = @YES;
+        chat[@"active1"] = @NO;
+        chat[@"active2"] = @NO;
         [chat saveInBackground];
-        _selectedChatToMe = chat;
-        
-        PFInstallation *currentInstallation = [PFInstallation currentInstallation];
-        [currentInstallation addUniqueObject:_selectedChatToMe.objectId forKey:@"channels"];
-        [currentInstallation saveInBackground];
+        _selectedChat = chat;
     }
-    if (!_selectedChatFromMe) {
-        //si el chat no ha sido inicializado por alguno de los dos usuarios se crea
-        PFObject *chat = [PFObject objectWithClassName:@"Chat"];
-        chat[@"from"] = [PFUser currentUser];
-        chat[@"to"] = selectedUser;
-        chat[@"event"] = _event;
-        chat[@"active"] = @NO;
-        [chat saveInBackground];
-        _selectedChatFromMe = chat;
-    }
-    //pongo chat activo
-    
-    _selectedChatToMe[@"active"]=@YES;
-    [_selectedChatToMe saveInBackground];
     
     [self performSegueWithIdentifier: @"goToChat" sender:self];
 }
@@ -160,9 +140,8 @@
 {
     NSLog(@"prepareForSegue: %@", segue.identifier);
     ChatViewController *destViewController = segue.destinationViewController;
-    [destViewController setChatToMe:_selectedChatToMe];
-    [destViewController setChatFromMe:_selectedChatFromMe];
-    [destViewController setChatUser:_selectedChatToMe[@"from"]];
+    [destViewController setChat:_selectedChat];
+    [destViewController setChatUser:_selectedChatUser];
 }
 
 -(BOOL)searchDisplayController:(UISearchDisplayController *)controller shouldReloadTableForSearchString:(NSString *)searchString

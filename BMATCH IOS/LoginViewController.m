@@ -10,6 +10,7 @@
 #import <Parse/Parse.h>
 
 @interface LoginViewController ()
+@property (weak, nonatomic) IBOutlet UIView *viewInput;
 @property (weak, nonatomic) IBOutlet UITextField *username;
 @property (weak, nonatomic) IBOutlet UITextField *password;
 @end
@@ -59,6 +60,8 @@
     }
     [currentInstallation addUniqueObject:[PFUser currentUser].objectId forKey:@"channels"];
     [currentInstallation save];
+    
+    NSLog(@"USUARIIO LOGEADO: %@", [PFUser currentUser].objectId);
 }
 
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
@@ -73,12 +76,6 @@
 - (void)viewDidLoad
 {
     [super viewDidLoad];
-
-    
-    //PFObject *testObject = [PFObject objectWithClassName:@"TestObject"];
-    //testObject[@"foo"] = @"bar";
-    //[testObject saveInBackground];
-	// Do any additional setup after loading the view.
 }
 
 -(void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event

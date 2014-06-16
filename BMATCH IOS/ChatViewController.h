@@ -11,7 +11,6 @@
 #import <Parse/Parse.h>
 
 @interface ChatViewController : UIViewController <UIBubbleTableViewDataSource>
-    -(void)setChatToMe:(PFObject *)chat;
-    -(void)setChatFromMe:(PFObject *)chat;
+    -(void)setChat:(PFObject *)chat;
     -(void) setChatUser:(PFObject *)chatUser;
 @end

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="4514" systemVersion="12F45" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" initialViewController="cvd-Tk-VU1">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="5056" systemVersion="12F2015" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" initialViewController="cvd-Tk-VU1">
     <dependencies>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="3747"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="3733"/>
     </dependencies>
     <scenes>
         <!--Login View Controller - BMATCH-->
@@ -201,7 +201,7 @@
             </objects>
             <point key="canvasLocation" x="-302" y="117"/>
         </scene>
-        <!--Profile View Controller - Profile-->
+        <!--Profile View Controller - Perfil-->
         <scene sceneID="C7W-4R-KlC">
             <objects>
                 <viewController id="Cg8-nY-ZgB" customClass="ProfileViewController" sceneMemberID="viewController">
@@ -259,7 +259,7 @@
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
                     </view>
-                    <tabBarItem key="tabBarItem" title="Profile" image="profile" id="EcI-cS-1gf"/>
+                    <tabBarItem key="tabBarItem" title="Perfil" image="profile" id="EcI-cS-1gf"/>
                     <connections>
                         <outlet property="career" destination="NLG-2F-Gw7" id="ltL-Po-sEV"/>
                         <outlet property="company" destination="h7l-cc-vxe" id="hja-0g-tDD"/>
@@ -338,7 +338,7 @@
             </objects>
             <point key="canvasLocation" x="276" y="117"/>
         </scene>
-        <!--Event List View Controller - History-->
+        <!--Event List View Controller - Historial-->
         <scene sceneID="JZu-eA-xDT">
             <objects>
                 <tableViewController id="WJg-ad-gaQ" customClass="EventListViewController" sceneMemberID="viewController">
@@ -361,7 +361,7 @@
                             <outlet property="delegate" destination="WJg-ad-gaQ" id="6uk-z5-MN8"/>
                         </connections>
                     </tableView>
-                    <tabBarItem key="tabBarItem" title="History" image="tag" id="1ho-70-u53"/>
+                    <tabBarItem key="tabBarItem" title="Historial" image="tag" id="1ho-70-u53"/>
                     <connections>
                         <segue destination="4Bb-f0-HJJ" kind="push" identifier="goToUserList" id="AkP-BY-j43"/>
                     </connections>
@@ -373,7 +373,7 @@
         <!--Chats List View Controller - Chats-->
         <scene sceneID="LKh-A2-9sD">
             <objects>
-                <tableViewController id="5CI-dw-cCJ" customClass="ChatsListViewController" sceneMemberID="viewController">
+                <tableViewController storyboardIdentifier="chatsListVC" id="5CI-dw-cCJ" customClass="ChatsListViewController" sceneMemberID="viewController">
                     <tableView key="view" opaque="NO" clipsSubviews="YES" clearsContextBeforeDrawing="NO" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="65" sectionHeaderHeight="22" sectionFooterHeight="22" id="92f-1V-jIh">
                         <rect key="frame" x="0.0" y="0.0" width="320" height="568"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -411,7 +411,7 @@
                     </tableView>
                     <tabBarItem key="tabBarItem" title="Chats" image="chat" id="F5U-un-qIk"/>
                     <connections>
-                        <segue destination="wtC-yN-AOa" kind="push" identifier="goToChat" id="Z5a-vd-5gs"/>
+                        <segue destination="Np5-mD-qgC" kind="push" identifier="goToChat" id="ZNe-q9-fji"/>
                     </connections>
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="oaK-gZ-KtZ" userLabel="First Responder" sceneMemberID="firstResponder"/>
@@ -419,56 +419,67 @@
             <point key="canvasLocation" x="1358" y="775"/>
         </scene>
         <!--Chat View Controller-->
-        <scene sceneID="VaH-Cy-76u">
+        <scene sceneID="xre-r0-Mcj">
             <objects>
-                <viewController id="wtC-yN-AOa" customClass="ChatViewController" sceneMemberID="viewController">
-                    <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="44" sectionHeaderHeight="22" sectionFooterHeight="22" id="elS-eo-BWm" customClass="UIBubbleTableView">
+                <viewController storyboardIdentifier="chatVC" id="Np5-mD-qgC" customClass="ChatViewController" sceneMemberID="viewController">
+                    <layoutGuides>
+                        <viewControllerLayoutGuide type="top" id="fbs-2P-sYt"/>
+                        <viewControllerLayoutGuide type="bottom" id="EiQ-dv-yuz"/>
+                    </layoutGuides>
+                    <view key="view" contentMode="scaleToFill" id="DPy-0u-zQO">
                         <rect key="frame" x="0.0" y="0.0" width="320" height="568"/>
-                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                        <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
-                        <toolbar key="tableFooterView" opaque="NO" clearsContextBeforeDrawing="NO" contentMode="scaleToFill" id="gAq-gg-y1I">
-                            <rect key="frame" x="0.0" y="130" width="320" height="44"/>
-                            <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
-                            <items>
-                                <barButtonItem style="plain" id="Gdt-7O-Vm2">
-                                    <textField key="customView" opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" minimumFontSize="17" id="nQM-hu-BDl">
-                                        <rect key="frame" x="16" y="7" width="256" height="30"/>
-                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                        <fontDescription key="fontDescription" type="system" pointSize="14"/>
-                                        <textInputTraits key="textInputTraits"/>
-                                    </textField>
-                                </barButtonItem>
-                                <barButtonItem image="paperPlane" id="p4g-fx-m74">
-                                    <connections>
-                                        <action selector="sendMessage:" destination="wtC-yN-AOa" id="ffw-MF-otK"/>
-                                    </connections>
-                                </barButtonItem>
-                            </items>
-                        </toolbar>
-                        <prototypes>
-                            <tableViewCell contentMode="scaleToFill" selectionStyle="blue" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" id="SQb-TB-Ekd" customClass="UIBubbleTableViewCell">
-                                <rect key="frame" x="0.0" y="86" width="320" height="44"/>
-                                <autoresizingMask key="autoresizingMask"/>
-                                <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="SQb-TB-Ekd" id="iKj-zD-fRq">
-                                    <rect key="frame" x="0.0" y="0.0" width="320" height="43"/>
-                                    <autoresizingMask key="autoresizingMask"/>
-                                </tableViewCellContentView>
-                            </tableViewCell>
-                        </prototypes>
-                    </tableView>
-                    <navigationItem key="navigationItem" id="iSK-4J-uqJ"/>
+                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                        <subviews>
+                            <tableView clipsSubviews="YES" contentMode="scaleToFill" fixedFrame="YES" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="44" sectionHeaderHeight="22" sectionFooterHeight="22" translatesAutoresizingMaskIntoConstraints="NO" id="Gq2-6K-xj4" customClass="UIBubbleTableView">
+                                <rect key="frame" x="0.0" y="0.0" width="320" height="458"/>
+                                <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                <prototypes>
+                                    <tableViewCell contentMode="scaleToFill" selectionStyle="blue" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" id="LUi-iI-l0C">
+                                        <rect key="frame" x="0.0" y="86" width="320" height="44"/>
+                                        <autoresizingMask key="autoresizingMask"/>
+                                        <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="LUi-iI-l0C" id="uqd-fu-mPk">
+                                            <rect key="frame" x="0.0" y="0.0" width="320" height="43"/>
+                                            <autoresizingMask key="autoresizingMask"/>
+                                        </tableViewCellContentView>
+                                    </tableViewCell>
+                                </prototypes>
+                            </tableView>
+                            <toolbar opaque="NO" clearsContextBeforeDrawing="NO" contentMode="scaleToFill" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="g1N-XF-04m">
+                                <rect key="frame" x="0.0" y="458" width="320" height="44"/>
+                                <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
+                                <items>
+                                    <barButtonItem style="plain" id="ECB-nl-Jcu">
+                                        <textField key="customView" opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" minimumFontSize="17" id="1dR-dm-XX0">
+                                            <rect key="frame" x="16" y="7" width="252" height="30"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                            <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                                            <textInputTraits key="textInputTraits"/>
+                                        </textField>
+                                    </barButtonItem>
+                                    <barButtonItem image="paperPlane" id="g63-8a-XIr">
+                                        <connections>
+                                            <action selector="sendMessage:" destination="Np5-mD-qgC" id="Qmb-cx-Onl"/>
+                                        </connections>
+                                    </barButtonItem>
+                                </items>
+                            </toolbar>
+                        </subviews>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
+                    </view>
+                    <navigationItem key="navigationItem" id="EQq-BK-dxy"/>
                     <connections>
-                        <outlet property="bubbleTable" destination="elS-eo-BWm" id="LN6-gK-zaB"/>
-                        <outlet property="navigationHeader" destination="iSK-4J-uqJ" id="VB0-N4-dFJ"/>
-                        <outlet property="textField" destination="nQM-hu-BDl" id="FzH-OE-7aE"/>
-                        <outlet property="toolbar" destination="gAq-gg-y1I" id="yrl-Tk-bW4"/>
+                        <outlet property="bubbleTable" destination="Gq2-6K-xj4" id="Qjc-fF-wWC"/>
+                        <outlet property="navigationHeader" destination="EQq-BK-dxy" id="7Gt-rG-qN4"/>
+                        <outlet property="textField" destination="1dR-dm-XX0" id="OdE-o1-p4t"/>
+                        <outlet property="toolbar" destination="g1N-XF-04m" id="o3S-Xs-8Ch"/>
                     </connections>
                 </viewController>
-                <placeholder placeholderIdentifier="IBFirstResponder" id="BvW-ad-rFA" userLabel="First Responder" sceneMemberID="firstResponder"/>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="DHm-qO-lOk" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="1892" y="446"/>
+            <point key="canvasLocation" x="1894" y="446"/>
         </scene>
-        <!--Users List View Controller - Root View Controller-->
+        <!--Users List View Controller - Contactos-->
         <scene sceneID="cDf-ev-s9a">
             <objects>
                 <tableViewController id="46Z-Ju-L3C" customClass="UsersListViewController" sceneMemberID="viewController">
@@ -514,11 +525,11 @@
                             </tableViewCell>
                         </prototypes>
                     </tableView>
-                    <tabBarItem key="tabBarItem" title="Contacts" image="users" id="8si-Ta-z9O"/>
-                    <navigationItem key="navigationItem" title="Root View Controller" id="HR5-Qa-nJi"/>
+                    <tabBarItem key="tabBarItem" title="Contactos" image="users" id="8si-Ta-z9O"/>
+                    <navigationItem key="navigationItem" title="Contactos" id="HR5-Qa-nJi"/>
                     <connections>
                         <outlet property="searchDisplayController" destination="3eo-MP-aX5" id="9kD-IC-3Nn"/>
-                        <segue destination="wtC-yN-AOa" kind="push" identifier="goToChat" id="Jiv-aB-aUu"/>
+                        <segue destination="Np5-mD-qgC" kind="push" identifier="goToChat" id="5qD-D6-NYG"/>
                     </connections>
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="p8O-dA-E39" userLabel="First Responder" sceneMemberID="firstResponder"/>
@@ -567,7 +578,7 @@
     </simulatedMetricsContainer>
     <inferredMetricsTieBreakers>
         <segue reference="eoy-VA-AJh"/>
-        <segue reference="JQe-x6-210"/>
-        <segue reference="Z5a-vd-5gs"/>
+        <segue reference="AkP-BY-j43"/>
+        <segue reference="ZNe-q9-fji"/>
     </inferredMetricsTieBreakers>
 </document>

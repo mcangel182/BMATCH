@@ -12,22 +12,33 @@
 
 @interface ChatsListViewController ()
 @property NSMutableArray *chats;
-@property (strong, nonatomic) PFObject* selectedChatToMe;
-@property (strong, nonatomic) PFObject* selectedChatFromMe;
+@property (strong, nonatomic) PFObject* selectedChat;
+@property (strong, nonatomic) PFObject* selectedChatUser;
 @property (strong, nonatomic) PFObject* event;
 @end
 
 @implementation ChatsListViewController
 
+@synthesize selectedChat = _selectedChat;
+@synthesize selectedChatUser = _selectedChatUser;
+@synthesize event = _event;
+
 - (void)loadChats {
     
     PFQuery *query = [PFQuery queryWithClassName:@"Chat"];
     [query whereKey:@"event" equalTo:_event];
-    [query whereKey:@"to" equalTo:[PFUser currentUser]];
-    [query whereKey:@"active" equalTo:@YES];
-    NSArray *chats = [query findObjects];
+    [query whereKey:@"user1" equalTo:[PFUser currentUser]];
+    [query whereKey:@"active1" equalTo:@YES];
+    NSArray *chats1 = [query findObjects];
     
-    [self.chats addObjectsFromArray: chats];
+    PFQuery *query2 = [PFQuery queryWithClassName:@"Chat"];
+    [query2 whereKey:@"event" equalTo:_event];
+    [query2 whereKey:@"user2" equalTo:[PFUser currentUser]];
+    [query2 whereKey:@"active2" equalTo:@YES];
+    NSArray *chats2 = [query2 findObjects];
+    
+    [self.chats addObjectsFromArray: chats1];
+    [self.chats addObjectsFromArray: chats2];
 }
 
 - (id)initWithStyle:(UITableViewStyle)style
@@ -81,22 +92,23 @@
     
     // Configure the cell...
     PFObject *chatAtIndex = [self.chats objectAtIndex:indexPath.row];
+    PFUser *user;
+    PFUser *user1 = chatAtIndex[@"user1"];
+    if([[PFUser currentUser].objectId isEqualToString:user1.objectId]){
+        user = chatAtIndex[@"user2"];
+    }
+    else{
+        user = user1;
+    }
     
-    PFUser *user = chatAtIndex[@"from"];;
     [user fetchIfNeeded];
     NSString *str = user[@"name"];
     str = [str stringByAppendingString:@" "];
     str = [str stringByAppendingString:user[@"lastName"]];
     cell.textLabel.text = str;
     
-    PFQuery *queryChat = [PFQuery queryWithClassName:@"Chat"];
-    [queryChat whereKey:@"from" equalTo:[PFUser currentUser]];
-    [queryChat whereKey:@"to" equalTo:user];
-    PFObject *chatAtIndex2 = [queryChat getFirstObject];
-    
     PFQuery *query = [PFQuery queryWithClassName:@"ChatMessage"];
-    NSArray *chats = [[NSArray alloc]initWithObjects:chatAtIndex, chatAtIndex2, nil];
-    [query whereKey:@"chat" containedIn:chats];
+    [query whereKey:@"chat" equalTo:chatAtIndex];
     [query orderByDescending:@"createdAt"];
     PFObject *lastMessage = [query getFirstObject];
     cell.detailTextLabel.textColor = [UIColor grayColor];
@@ -104,6 +116,8 @@
     
     cell.imageView.layer.cornerRadius = [UIImage imageNamed:@"uknownUser"].size.height/2;
     cell.imageView.layer.masksToBounds = YES;
+    cell.imageView.layer.borderColor = [[UIColor colorWithRed:(202/255.0) green:(202/255.0) blue:(202/255.0) alpha:1.0] CGColor];
+    cell.imageView.layer.borderWidth = 1.0f;
     cell.imageView.image = [UIImage imageNamed:@"uknownUser"];
     return cell;
 }
@@ -111,14 +125,15 @@
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
     [tableView deselectRowAtIndexPath:indexPath animated:NO];
-    _selectedChatToMe = [_chats objectAtIndex:indexPath.row];
-    
-    PFQuery *queryChat = [PFQuery queryWithClassName:@"Chat"];
-    [queryChat whereKey:@"from" equalTo:[PFUser currentUser]];
-    [queryChat whereKey:@"to" equalTo:_selectedChatToMe[@"from"]];
-    _selectedChatFromMe = [queryChat getFirstObject];
-    
-    NSLog(@"\ntapped item: %@", _selectedChatToMe.objectId);
+    _selectedChat = [_chats objectAtIndex:indexPath.row];
+    PFUser *user1 = _selectedChat[@"user1"];
+    if([[PFUser currentUser].objectId isEqualToString:user1.objectId]){
+        _selectedChatUser = _selectedChat[@"user2"];
+    }
+    else{
+        _selectedChatUser = user1;
+    }
+    NSLog(@"\ntapped item: %@", _selectedChat.objectId);
     [self performSegueWithIdentifier: @"goToChat" sender:self];
 }
 
@@ -126,9 +141,8 @@
 {
     NSLog(@"prepareForSegue: %@", segue.identifier);
     ChatViewController *destViewController = segue.destinationViewController;
-    [destViewController setChatToMe:_selectedChatToMe];
-    [destViewController setChatFromMe:_selectedChatFromMe];
-    [destViewController setChatUser:_selectedChatToMe[@"from"]];
+    [destViewController setChat:_selectedChat];
+    [destViewController setChatUser:_selectedChatUser];
 }
 
 // Override to support conditional editing of the table view.
@@ -143,10 +157,15 @@
 - (void)tableView:(UITableView *)tableView commitEditingStyle:(UITableViewCellEditingStyle)editingStyle forRowAtIndexPath:(NSIndexPath *)indexPath {
     if (editingStyle == UITableViewCellEditingStyleDelete) {
         //add code here for when you hit delete
-        _selectedChatToMe = [_chats objectAtIndex:indexPath.row];
-        _selectedChatToMe[@"active"]=@NO;
-
-        [_selectedChatToMe saveInBackground];
+        _selectedChat = [_chats objectAtIndex:indexPath.row];
+        PFUser *user1 = _selectedChat[@"user1"];
+        if([[PFUser currentUser].objectId isEqualToString:user1.objectId]){
+            _selectedChat[@"active1"]=@NO;
+        }
+        else{
+            _selectedChat[@"active2"]=@NO;
+        }
+        [_selectedChat saveInBackground];
         [_chats removeObjectAtIndex:indexPath.row];
         [self.tableView reloadData];
     }

@@ -8,6 +8,8 @@
 
 #import "AppDelegate.h"
 #import <Parse/Parse.h>
+#import "ChatViewController.h"
+#import "LoginViewController.h"
 
 @implementation AppDelegate
 
@@ -22,14 +24,39 @@
     [PFAnalytics trackAppOpenedWithLaunchOptions:launchOptions];
     //parse
     
+    printf("\n\nDID FINISHH LAUNCHIIINGGGG!!!\n\n");
     
     // Extract the notification data
-    //NSDictionary *notificationPayload = launchOptions[UIApplicationLaunchOptionsRemoteNotificationKey];
-    
+    NSDictionary *notificationPayload = launchOptions[UIApplicationLaunchOptionsRemoteNotificationKey];
+
     // Create a pointer to the Photo object
     //NSString *newMessage = [notificationPayload objectForKey:@"alert"];
+    if (notificationPayload) {
+        if ([PFUser currentUser]) {
+            printf("\n\nDID FINISHH LAUNCHIIINGGGG2!!!\n\n");
+            UIStoryboard *mainStoryboard = [UIStoryboard storyboardWithName:@"Main"
+                                                                     bundle: nil];
+            ChatViewController *controller = (ChatViewController*)[mainStoryboard
+                                                                   instantiateViewControllerWithIdentifier: @"chatVC"];
+            NSString *chatId = [notificationPayload objectForKey:@"chat"];
+            PFObject *chat = [PFObject objectWithoutDataWithClassName:@"Chat" objectId:chatId];
+            [chat fetchIfNeeded];
+            NSString *chatUserId = [notificationPayload objectForKey:@"chatUser"];
+            PFQuery *query2 = [PFUser query];
+            PFObject *chatUser = [query2 getObjectWithId:chatUserId];
+            [chatUser fetchIfNeeded];
+            [controller setChat:chat];
+            [controller setChatUser:chatUser];
+            application.applicationIconBadgeNumber = 0;
+            UINavigationController *navigationController = (UINavigationController *)self.window.rootViewController;
+            controller.hidesBottomBarWhenPushed = YES;
+            [navigationController pushViewController:controller animated:YES];
+            
+            //[self.window makeKeyAndVisible];
+        }
+    }
     
-    return YES;
+    return YES;    
 }
 
 - (void)application:(UIApplication *)application
@@ -44,6 +71,37 @@ didRegisterForRemoteNotificationsWithDeviceToken:(NSData *)deviceToken
 - (void)application:(UIApplication *)application
 didReceiveRemoteNotification:(NSDictionary *)userInfo {
     [PFPush handlePush:userInfo];
+}
+
+- (void)application:(UIApplication *)application
+didReceiveRemoteNotification:(NSDictionary *)userInfo
+fetchCompletionHandler:(void (^)(UIBackgroundFetchResult))handler {
+    printf("\n\nDID RECIEVE ROMOTE NOTIF!!!\n\n");
+    
+    UIStoryboard *mainStoryboard = [UIStoryboard storyboardWithName:@"Main"
+                                                             bundle: nil];
+    
+    ChatViewController *controller = (ChatViewController*)[mainStoryboard
+                                                                   instantiateViewControllerWithIdentifier: @"chatVC"];
+    if ([PFUser currentUser]) {
+        printf("\n\nDID RECIEVE ROMOTE NOTIF2!!!\n\n");
+        NSString *chatId = [userInfo objectForKey:@"chat"];
+        PFObject *chat = [PFObject objectWithoutDataWithClassName:@"Chat" objectId:chatId];
+        [chat fetchIfNeeded];
+        NSString *chatUserId = [userInfo objectForKey:@"chatUser"];
+        PFQuery *query2 = [PFUser query];
+        PFObject *chatUser = [query2 getObjectWithId:chatUserId];
+        [chatUser fetchIfNeeded];
+        [controller setChat:chat];
+        [controller setChatUser:chatUser];
+        application.applicationIconBadgeNumber = 0;
+        UINavigationController *navigationController = (UINavigationController *)self.window.rootViewController;
+        controller.hidesBottomBarWhenPushed = YES;
+        [navigationController pushViewController:controller animated:YES];
+        //handler(UIBackgroundFetchResultNewData);
+    } else {
+        //handler(UIBackgroundFetchResultNoData);
+    }
 }
 
 - (void)applicationWillResignActive:(UIApplication *)application

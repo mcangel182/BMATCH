@@ -124,6 +124,12 @@
     
     if (eventoExistente){
         // Ya se encuentra registrado en el evento revise el historial de eventos
+        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Alerta!"
+                                                        message:@"Ya se encuentra registrado en este evento. Revise el historial"
+                                                       delegate:nil
+                                              cancelButtonTitle:@"OK"
+                                              otherButtonTitles:nil];
+        [alert show];
     }
     else{
         [self performSegueWithIdentifier: @"goToUserList" sender:sender];

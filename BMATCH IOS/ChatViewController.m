@@ -25,18 +25,15 @@
     NSMutableArray *bubbleData;
 }
 
-@property (strong, nonatomic) PFObject* chatToMe;
-@property (strong, nonatomic) PFObject* chatFromMe;
+@property (strong, nonatomic) PFObject* chat;
 @property (strong, nonatomic) PFObject* chatUser;
 
 @end
 
 @implementation ChatViewController
 
-@synthesize chatToMe = _chatToMe;
-@synthesize chatFromMe = _chatFromMe;
+@synthesize chat = _chat;
 @synthesize chatUser = _chatUser;
-
 
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
 {
@@ -49,14 +46,15 @@
 
 - (void)viewDidLoad
 {
+    printf("\n\n HIZOOO VIEW DID LOOOAAADD!!!\n\n");
     [super viewDidLoad];
     
     // Configuración del titulo de la vista
-    PFUser *chatUser = _chatToMe[@"from"];
-    [chatUser fetchIfNeeded];
-    NSString *nombreCompleto = chatUser[@"name"];
+    [_chatUser fetchIfNeeded];
+    NSString *nombreCompleto = _chatUser[@"name"];
+    printf("\n\n HIZOOO VIEW DID LOOOAAADD222!!!\n\n");
     nombreCompleto = [nombreCompleto stringByAppendingString:@" "];
-    nombreCompleto = [nombreCompleto stringByAppendingString:chatUser[@"lastName"]];
+    nombreCompleto = [nombreCompleto stringByAppendingString:_chatUser[@"lastName"]];
     [navigationHeader setTitle:nombreCompleto];
     
     self.hidesBottomBarWhenPushed = YES;
@@ -65,18 +63,20 @@
     
     bubbleData = [[NSMutableArray alloc] init];
     PFQuery *query = [PFQuery queryWithClassName:@"ChatMessage"];
-    [query whereKey:@"chat" equalTo:_chatToMe];
-    NSArray *messages1 = [query findObjects];
+    [query whereKey:@"chat" equalTo:_chat];
+    [query whereKey:@"from" equalTo:_chatUser];
+    NSArray *messagesForMe = [query findObjects];
     PFQuery *query2 = [PFQuery queryWithClassName:@"ChatMessage"];
-    [query2 whereKey:@"chat" equalTo:_chatFromMe];
-    NSArray *messages2 = [query2 findObjects];
+    [query2 whereKey:@"chat" equalTo:_chat];
+    [query2 whereKey:@"to" equalTo:_chatUser];
+    NSArray *messagesFromMe = [query2 findObjects];
     
-    for (PFObject *message in messages1) {
+    for (PFObject *message in messagesForMe) {
         NSBubbleData *bubble;
         bubble = [NSBubbleData dataWithText:message[@"message"] date:[message createdAt] type:BubbleTypeSomeoneElse];
         [bubbleData addObject:bubble];
     }
-    for (PFObject *message in messages2) {
+    for (PFObject *message in messagesFromMe) {
         NSBubbleData *bubble;
         bubble = [NSBubbleData dataWithText:message[@"message"] date:[message createdAt] type:BubbleTypeMine];
         [bubbleData addObject:bubble];
@@ -87,7 +87,7 @@
     // Interval of 120 means that if the next messages comes in 2 minutes since the last message, it will be added into the same group.
     // Groups are delimited with header which contains date and time for the first message in the group.
     
-    bubbleTable.snapInterval = 120;
+    bubbleTable.snapInterval = 86400;
     
     // The line below enables avatar support. Avatar can be specified for each bubble with .avatar property of NSBubbleData.
     // Avatars are enabled for the whole table at once. If particular NSBubbleData misses the avatar, a default placeholder will be set (missingAvatar.png)
@@ -105,7 +105,6 @@
     [bubbleTable reloadData];
     
     // Keyboard events
-    
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(keyboardWasShown:) name:UIKeyboardWillShowNotification object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(keyboardWillBeHidden:) name:UIKeyboardWillHideNotification object:nil];
 }
@@ -143,9 +142,9 @@
     
     [UIView animateWithDuration:0.2f animations:^{
         
-        CGRect frame = textInputView.frame;
+        CGRect frame = toolbar.frame;
         frame.origin.y -= kbSize.height;
-        textInputView.frame = frame;
+        toolbar.frame = frame;
         
         frame = bubbleTable.frame;
         frame.size.height -= kbSize.height;
@@ -160,9 +159,9 @@
     
     [UIView animateWithDuration:0.2f animations:^{
         
-        CGRect frame = textInputView.frame;
+        CGRect frame = toolbar.frame;
         frame.origin.y += kbSize.height;
-        textInputView.frame = frame;
+        toolbar.frame = frame;
         
         frame = bubbleTable.frame;
         frame.size.height += kbSize.height;
@@ -177,7 +176,9 @@
     NSBubbleData *sayBubble = [NSBubbleData dataWithText:textField.text date:[NSDate dateWithTimeIntervalSinceNow:0] type:BubbleTypeMine];
     PFObject *chatMessage = [PFObject objectWithClassName:@"ChatMessage"];
     chatMessage[@"message"] = textField.text;
-    chatMessage[@"chat"] = _chatFromMe;
+    chatMessage[@"chat"] = _chat;
+    chatMessage[@"from"] = [PFUser currentUser];
+    chatMessage[@"to"] = _chatUser;
     [chatMessage saveInBackground];
     [bubbleData addObject:sayBubble];
     [bubbleTable reloadData];
@@ -189,10 +190,9 @@
     alert = [alert stringByAppendingString:@": "];
     alert = [alert stringByAppendingString:textField.text];
 
-    NSDictionary *data = [NSDictionary dictionaryWithObjectsAndKeys:
-                          alert, @"alert",
-                          @"Increment", @"badge",
-                          nil];
+    NSDictionary *data = @{@"alert": alert,
+                           @"chat": _chat.objectId,
+                           @"chatUser": [PFUser currentUser].objectId};
     PFPush *push = [[PFPush alloc] init];
     [push setChannel:_chatUser.objectId];
     [push setData:data];
@@ -200,23 +200,33 @@
     
     textField.text = @"";
     [textField resignFirstResponder];
+    
+    //pongo chat activo
+    PFObject *user1 = _chat[@"user1"];
+    if([_chatUser.objectId isEqualToString:user1.objectId]){
+        if ([_chat[@"active2"] isEqual:@NO]) {
+            _chat[@"active2"]=@YES;
+            [_chat saveInBackground];
+        }
+    }
+    else{
+        if ([_chat[@"active1"] isEqual:@NO]) {
+            _chat[@"active1"]=@YES;
+            [_chat saveInBackground];
+        }
+    }
 }
 
--(void)setChatToMe:(PFObject *)chat{
-    _chatToMe = chat;
-    NSLog(@"Chat to me %@", chat.objectId);
+-(void)setChat:(PFObject *)chat{
+    _chat = chat;
+    NSLog(@"Chat %@", chat.objectId);
     
 }
 
--(void)setChatFromMe:(PFObject *)chat{
-    _chatFromMe = chat;
-    NSLog(@"Chat from me %@", chat.objectId);
-    
-}
-     
 -(void) setChatUser:(PFObject *)chatUser{
     _chatUser = chatUser;
     NSLog(@"Chat user %@", chatUser.objectId);
 }
+
 
 @end

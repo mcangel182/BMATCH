@@ -35,7 +35,7 @@
     
     // UITableView properties
     
-    self.backgroundColor = [UIColor clearColor];
+    self.backgroundColor = [UIColor colorWithRed:239 green:239 blue:239 alpha:1];
     self.separatorStyle = UITableViewCellSeparatorStyleNone;
     assert(self.style == UITableViewStylePlain);
     
@@ -46,10 +46,6 @@
     
     self.snapInterval = 120;
     self.typingBubble = NSBubbleTypingTypeNobody;
-    
-//    CGRect tbFrame = [self frame];
-//    tbFrame.size.height = 100;
-//    [self setFrame:tbFrame];
 }
 
 - (id)init
