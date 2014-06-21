@@ -617,40 +617,25 @@
             <point key="canvasLocation" x="-1887" y="117"/>
         </scene>
     </scenes>
-    <resources>
-        <image name="bmatchicon" width="32" height="32"/>
-        <image name="camera" width="100" height="77"/>
-        <image name="chat" width="24" height="24"/>
-        <image name="header" width="396" height="125"/>
-        <image name="inicio" width="334" height="185"/>
-        <image name="paperPlane" width="26" height="26"/>
-        <image name="profile" width="32" height="32"/>
-        <image name="tag" width="32" height="32"/>
-        <image name="users" width="24" height="24"/>
-    </resources>
-    <simulatedMetricsContainer key="defaultSimulatedMetrics">
-        <simulatedStatusBarMetrics key="statusBar"/>
-        <simulatedOrientationMetrics key="orientation"/>
-        <simulatedScreenMetrics key="destination" type="retina4"/>
-    </simulatedMetricsContainer>
-    <inferredMetricsTieBreakers>
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-        <segue reference="JQe-x6-210"/>
-        <segue reference="eoy-VA-AJh"/>
-=======
-        <segue reference="UlO-7K-5WJ"/>
-        <segue reference="JQe-x6-210"/>
->>>>>>> FETCH_HEAD
-=======
-        <segue reference="UlO-7K-5WJ"/>
-        <segue reference="JQe-x6-210"/>
->>>>>>> FETCH_HEAD
-=======
-        <segue reference="UlO-7K-5WJ"/>
-        <segue reference="JQe-x6-210"/>
->>>>>>> FETCH_HEAD
-        <segue reference="ZNe-q9-fji"/>
-    </inferredMetricsTieBreakers>
+<resources>
+<image name="bmatchicon" width="32" height="32"/>
+<image name="camera" width="100" height="77"/>
+<image name="chat" width="24" height="24"/>
+<image name="header" width="396" height="125"/>
+<image name="inicio" width="334" height="185"/>
+<image name="paperPlane" width="26" height="26"/>
+<image name="profile" width="32" height="32"/>
+<image name="tag" width="32" height="32"/>
+<image name="users" width="24" height="24"/>
+</resources>
+<simulatedMetricsContainer key="defaultSimulatedMetrics">
+<simulatedStatusBarMetrics key="statusBar"/>
+<simulatedOrientationMetrics key="orientation"/>
+<simulatedScreenMetrics key="destination" type="retina4"/>
+</simulatedMetricsContainer>
+<inferredMetricsTieBreakers>
+<segue reference="UlO-7K-5WJ"/>
+<segue reference="JQe-x6-210"/>
+<segue reference="ZNe-q9-fji"/>
+</inferredMetricsTieBreakers>
 </document>
