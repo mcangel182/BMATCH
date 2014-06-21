@@ -156,7 +156,7 @@
 
 - (void)filterContentForSearchText:(NSString*)searchText scope:(NSString*)scope
 {
-    NSPredicate *resultPredicate = [NSPredicate predicateWithFormat:@"objectId contains[c] %@", searchText];
+    NSPredicate *resultPredicate = [NSPredicate predicateWithFormat:@"(user.name beginswith[c] %@) OR (user.lastName beginswith[c] %@)", searchText, searchText];
     _searchResults = [_users filteredArrayUsingPredicate:resultPredicate];
 }
 
