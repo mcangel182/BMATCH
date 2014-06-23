@@ -21,6 +21,7 @@
     //IBOutlet UITextField *textField;
     IBOutlet UINavigationItem *navigationHeader;
     IBOutlet UITextView *textField;
+    IBOutlet UIBarButtonItem *sendButton;
 
     NSMutableArray *bubbleData;
 }
@@ -240,6 +241,14 @@
 }
 
 -(BOOL)textView:(UITextView *)textView shouldChangeTextInRange:(NSRange)range replacementText:(NSString *)text{
+    
+    if (textView.text.length==0 && range.length==0){
+        sendButton.enabled = YES;
+    }
+    else if (range.length==1 && textView.text.length == 1){
+        sendButton.enabled = NO;
+    }
+    
     CGRect textFrame = textView.frame;
     CGSize size = [textView sizeThatFits:CGSizeMake(textFrame.size.width, 70)];
     NSInteger heightDif = size.height-textFrame.size.height;

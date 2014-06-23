@@ -525,7 +525,7 @@
                                             </constraints>
                                         </view>
                                     </barButtonItem>
-                                    <barButtonItem image="paperPlane" id="g63-8a-XIr">
+                                    <barButtonItem enabled="NO" image="paperPlane" id="g63-8a-XIr">
                                         <connections>
                                             <action selector="sendMessage:" destination="Np5-mD-qgC" id="Qmb-cx-Onl"/>
                                         </connections>
@@ -539,6 +539,7 @@
                     <connections>
                         <outlet property="bubbleTable" destination="Gq2-6K-xj4" id="Qjc-fF-wWC"/>
                         <outlet property="navigationHeader" destination="EQq-BK-dxy" id="7Gt-rG-qN4"/>
+                        <outlet property="sendButton" destination="g63-8a-XIr" id="WKn-ua-WBi"/>
                         <outlet property="textField" destination="bIJ-wK-Dvy" id="qtC-4g-MrN"/>
                         <outlet property="toolbar" destination="g1N-XF-04m" id="o3S-Xs-8Ch"/>
                     </connections>
