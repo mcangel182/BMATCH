@@ -29,8 +29,6 @@
     // Extract the notification data
     NSDictionary *notificationPayload = launchOptions[UIApplicationLaunchOptionsRemoteNotificationKey];
 
-    // Create a pointer to the Photo object
-    //NSString *newMessage = [notificationPayload objectForKey:@"alert"];
     if (notificationPayload) {
         if ([PFUser currentUser]) {
             printf("\n\nDID FINISHH LAUNCHIIINGGGG2!!!\n\n");
@@ -51,8 +49,6 @@
             UINavigationController *navigationController = (UINavigationController *)self.window.rootViewController;
             controller.hidesBottomBarWhenPushed = YES;
             [navigationController pushViewController:controller animated:YES];
-            
-            //[self.window makeKeyAndVisible];
         }
     }
     
@@ -78,30 +74,39 @@ didReceiveRemoteNotification:(NSDictionary *)userInfo
 fetchCompletionHandler:(void (^)(UIBackgroundFetchResult))handler {
     printf("\n\nDID RECIEVE ROMOTE NOTIF!!!\n\n");
     
-    UIStoryboard *mainStoryboard = [UIStoryboard storyboardWithName:@"Main"
-                                                             bundle: nil];
-    
-    ChatViewController *controller = (ChatViewController*)[mainStoryboard
-                                                                   instantiateViewControllerWithIdentifier: @"chatVC"];
     if ([PFUser currentUser]) {
-        printf("\n\nDID RECIEVE ROMOTE NOTIF2!!!\n\n");
-        NSString *chatId = [userInfo objectForKey:@"chat"];
-        PFObject *chat = [PFObject objectWithoutDataWithClassName:@"Chat" objectId:chatId];
-        [chat fetchIfNeeded];
-        NSString *chatUserId = [userInfo objectForKey:@"chatUser"];
-        PFQuery *query2 = [PFUser query];
-        PFObject *chatUser = [query2 getObjectWithId:chatUserId];
-        [chatUser fetchIfNeeded];
-        [controller setChat:chat];
-        [controller setChatUser:chatUser];
-        application.applicationIconBadgeNumber = 0;
-        UINavigationController *navigationController = (UINavigationController *)self.window.rootViewController;
-        controller.hidesBottomBarWhenPushed = YES;
-        [navigationController pushViewController:controller animated:YES];
-        //handler(UIBackgroundFetchResultNewData);
-    } else {
-        //handler(UIBackgroundFetchResultNoData);
-    }
+            printf("\n\nDID RECIEVE ROMOTE NOTIF2!!!\n\n");
+            UINavigationController *navigationController = (UINavigationController *)self.window.rootViewController;
+            
+            NSString *chatId = [userInfo objectForKey:@"chat"];
+            PFObject *chat = [PFObject objectWithoutDataWithClassName:@"Chat" objectId:chatId];
+            [chat fetchIfNeeded];
+            NSString *chatUserId = [userInfo objectForKey:@"chatUser"];
+            PFQuery *query2 = [PFUser query];
+            PFObject *chatUser = [query2 getObjectWithId:chatUserId];
+            [chatUser fetchIfNeeded];
+            
+            if ([navigationController.visibleViewController isMemberOfClass:[ChatViewController class]]){
+                printf("\n\nES UN CHAT!!!\n\n");
+                ChatViewController *chatController = navigationController.visibleViewController;
+                if ([chatController.chat.objectId isEqualToString:chat.objectId]){
+                    //Ya esta cargado el chat
+                    printf("\n\nES UN CHAT2!!!\n\n");
+                    [chatController recieveMessage:[userInfo objectForKey:@"msg"]];
+                }
+            }
+            else{
+                UIStoryboard *mainStoryboard = [UIStoryboard storyboardWithName:@"Main"
+                                                                         bundle: nil];
+                ChatViewController *controller = (ChatViewController*)[mainStoryboard
+                                                                       instantiateViewControllerWithIdentifier: @"chatVC"];
+                [controller setChat:chat];
+                [controller setChatUser:chatUser];
+                application.applicationIconBadgeNumber = 0;
+                controller.hidesBottomBarWhenPushed = YES;
+                [navigationController pushViewController:controller animated:YES];
+            }
+        }
 }
 
 - (void)applicationWillResignActive:(UIApplication *)application

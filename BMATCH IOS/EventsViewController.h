@@ -10,6 +10,6 @@
 #import <Parse/Parse.h>
 #import <AVFoundation/AVFoundation.h>
 
-@interface EventsViewController: UIViewController <AVCaptureMetadataOutputObjectsDelegate>
+@interface EventsViewController: UIViewController <AVCaptureMetadataOutputObjectsDelegate, UITextFieldDelegate>
 
 @end

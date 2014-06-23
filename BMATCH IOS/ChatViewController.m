@@ -15,17 +15,16 @@
 
 @interface ChatViewController ()
 {
-    
     IBOutlet UIToolbar *toolbar;
     IBOutlet UIBubbleTableView *bubbleTable;
     IBOutlet UIView *textInputView;
-    IBOutlet UITextField *textField;
+    //IBOutlet UITextField *textField;
     IBOutlet UINavigationItem *navigationHeader;
+    IBOutlet UITextView *textField;
 
     NSMutableArray *bubbleData;
 }
 
-@property (strong, nonatomic) PFObject* chat;
 @property (strong, nonatomic) PFObject* chatUser;
 
 @end
@@ -49,10 +48,16 @@
     printf("\n\n HIZOOO VIEW DID LOOOAAADD!!!\n\n");
     [super viewDidLoad];
     
+    
+    textField.delegate = self;
+    textField.layer.borderWidth = 1.0f;
+    textField.layer.cornerRadius = 5;
+    textField.clipsToBounds = YES;
+    textField.layer.borderColor = [[UIColor lightGrayColor] CGColor];
+    
     // Configuración del titulo de la vista
     [_chatUser fetchIfNeeded];
     NSString *nombreCompleto = _chatUser[@"name"];
-    printf("\n\n HIZOOO VIEW DID LOOOAAADD222!!!\n\n");
     nombreCompleto = [nombreCompleto stringByAppendingString:@" "];
     nombreCompleto = [nombreCompleto stringByAppendingString:_chatUser[@"lastName"]];
     [navigationHeader setTitle:nombreCompleto];
@@ -107,6 +112,8 @@
     // Keyboard events
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(keyboardWasShown:) name:UIKeyboardWillShowNotification object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(keyboardWillBeHidden:) name:UIKeyboardWillHideNotification object:nil];
+    
+    [self scrollToLast];
 }
 
 - (void)didReceiveMemoryWarning
@@ -147,7 +154,7 @@
         toolbar.frame = frame;
         
         frame = bubbleTable.frame;
-        frame.size.height -= kbSize.height;
+        frame.origin.y -= kbSize.height;
         bubbleTable.frame = frame;
     }];
 }
@@ -164,7 +171,7 @@
         toolbar.frame = frame;
         
         frame = bubbleTable.frame;
-        frame.size.height += kbSize.height;
+        frame.origin.y += kbSize.height;
         bubbleTable.frame = frame;
     }];
 }
@@ -192,13 +199,15 @@
 
     NSDictionary *data = @{@"alert": alert,
                            @"chat": _chat.objectId,
-                           @"chatUser": [PFUser currentUser].objectId};
+                           @"chatUser": [PFUser currentUser].objectId,
+                           @"msg": textField.text};
     PFPush *push = [[PFPush alloc] init];
     [push setChannel:_chatUser.objectId];
     [push setData:data];
     [push sendPushInBackground];
     
     textField.text = @"";
+    [self adjustTextView];
     [textField resignFirstResponder];
     
     //pongo chat activo
@@ -215,6 +224,8 @@
             [_chat saveInBackground];
         }
     }
+    
+    [self scrollToLast];
 }
 
 -(void)setChat:(PFObject *)chat{
@@ -228,5 +239,59 @@
     NSLog(@"Chat user %@", chatUser.objectId);
 }
 
+-(BOOL)textView:(UITextView *)textView shouldChangeTextInRange:(NSRange)range replacementText:(NSString *)text{
+    CGRect textFrame = textView.frame;
+    CGSize size = [textView sizeThatFits:CGSizeMake(textFrame.size.width, 70)];
+    NSInteger heightDif = size.height-textFrame.size.height;
+    if (heightDif!=0){
+        printf("hay diferencia");
+        
+        //Subir o bajar el toolbar
+        CGRect frame = toolbar.frame;
+        frame.origin.y -= heightDif;
+        //frame.size.height += heightDif;
+        toolbar.frame = frame;
+        
+        textFrame.size.height += heightDif;
+        //textFrame.origin.y -= heightDif;
+        textView.frame = textFrame;
+    }
+    return YES;
+}
+
+-(void)recieveMessage:(NSString *)message{
+    NSBubbleData *sayBubble = [NSBubbleData dataWithText:message date:[NSDate dateWithTimeIntervalSinceNow:0] type:BubbleTypeSomeoneElse];
+    [bubbleData addObject:sayBubble];
+    [bubbleTable reloadData];
+    [self scrollToLast];
+}
+
+-(void)scrollToLast{
+    NSInteger sections = [bubbleTable.dataSource numberOfSectionsInTableView:bubbleTable];
+    NSInteger rowsInSection = [bubbleTable.dataSource tableView:bubbleTable numberOfRowsInSection:sections-1];
+    if (sections>0 && rowsInSection>0){
+        NSIndexPath *scrollIndexPath = [NSIndexPath indexPathForRow:(rowsInSection - 1) inSection:sections-1];
+        [bubbleTable scrollToRowAtIndexPath:scrollIndexPath atScrollPosition:UITableViewScrollPositionBottom animated:YES];
+    }
+}
+
+-(void)adjustTextView{
+    CGRect textFrame = textField.frame;
+    CGSize size = [textField sizeThatFits:CGSizeMake(textFrame.size.width, 70)];
+    NSInteger heightDif = size.height-textFrame.size.height;
+    if (heightDif!=0){
+        printf("hay diferencia");
+        
+        //Subir o bajar el toolbar
+        CGRect frame = toolbar.frame;
+        frame.origin.y -= heightDif;
+        //frame.size.height += heightDif;
+        toolbar.frame = frame;
+        
+        textFrame.size.height += heightDif;
+        //textFrame.origin.y -= heightDif;
+        textField.frame = textFrame;
+    }
+}
 
 @end

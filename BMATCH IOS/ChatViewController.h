@@ -10,7 +10,9 @@
 #import "UIBubbleTableViewDataSource.h"
 #import <Parse/Parse.h>
 
-@interface ChatViewController : UIViewController <UIBubbleTableViewDataSource>
+@interface ChatViewController : UIViewController <UIBubbleTableViewDataSource, UITextViewDelegate>
+    @property (strong, nonatomic) PFObject* chat;
     -(void)setChat:(PFObject *)chat;
     -(void) setChatUser:(PFObject *)chatUser;
+-(void)recieveMessage:(NSString *)message;
 @end

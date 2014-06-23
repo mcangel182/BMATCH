@@ -154,7 +154,7 @@
     //_viewPreview.layer.borderWidth = 2.0f;
     _isReading = NO;
     _captureSession = nil;
-
+    _eventId.delegate = self;
 }
 
 - (void)didReceiveMemoryWarning
@@ -255,4 +255,23 @@
 {
     [_eventId resignFirstResponder];
 }
+
+
+//Temporal- hay que borrar
+
+-(BOOL)textField:(UITextField *)textField shouldChangeCharactersInRange:(NSRange)range replacementString:(NSString *)string{
+    [self adjustFrames];
+    return YES;
+}
+-(void) adjustFrames
+{
+    UITextView *calculationView = [[UITextView alloc] init];
+    [calculationView setText:_eventId.text];
+    CGSize size = [calculationView sizeThatFits:CGSizeMake(_eventId.frame.size.width, FLT_MAX)];
+    
+    CGRect textFrame = _eventId.frame;
+    textFrame.size.height = size.height;
+    _eventId.frame = textFrame;
+}
+
 @end

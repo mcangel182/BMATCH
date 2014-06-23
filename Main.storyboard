@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="4514" systemVersion="12F45" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" initialViewController="cvd-Tk-VU1">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="5056" systemVersion="12F45" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" initialViewController="cvd-Tk-VU1">
     <dependencies>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="3747"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="3733"/>
     </dependencies>
     <scenes>
         <!--Login View Controller - BMATCH-->
@@ -352,6 +352,7 @@
                                     <textField opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="nNe-cA-W4P">
                                         <rect key="frame" x="0.0" y="29" width="280" height="30"/>
                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                        <nil key="textColor"/>
                                         <fontDescription key="fontDescription" type="system" pointSize="14"/>
                                         <textInputTraits key="textInputTraits"/>
                                     </textField>
@@ -505,13 +506,24 @@
                                 <rect key="frame" x="0.0" y="458" width="320" height="44"/>
                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
                                 <items>
-                                    <barButtonItem style="plain" id="ECB-nl-Jcu">
-                                        <textField key="customView" opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" minimumFontSize="17" id="1dR-dm-XX0">
-                                            <rect key="frame" x="16" y="7" width="252" height="30"/>
+                                    <barButtonItem style="plain" id="HTt-Ju-HcK">
+                                        <view key="customView" contentMode="scaleToFill" id="lrh-yI-C5n">
+                                            <rect key="frame" x="16" y="7" width="254" height="31"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                            <fontDescription key="fontDescription" type="system" pointSize="14"/>
-                                            <textInputTraits key="textInputTraits" autocapitalizationType="sentences" autocorrectionType="yes"/>
-                                        </textField>
+                                            <subviews>
+                                                <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" ambiguous="YES" misplaced="YES" translatesAutoresizingMaskIntoConstraints="NO" id="bIJ-wK-Dvy">
+                                                    <rect key="frame" x="0.0" y="0.0" width="254" height="31"/>
+                                                    <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                                    <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="calibratedRGB"/>
+                                                    <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                                                    <textInputTraits key="textInputTraits" autocapitalizationType="sentences" autocorrectionType="yes"/>
+                                                </textView>
+                                            </subviews>
+                                            <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
+                                            <constraints>
+                                                <constraint firstItem="bIJ-wK-Dvy" firstAttribute="top" secondItem="lrh-yI-C5n" secondAttribute="top" id="Bey-NK-Ek2"/>
+                                            </constraints>
+                                        </view>
                                     </barButtonItem>
                                     <barButtonItem image="paperPlane" id="g63-8a-XIr">
                                         <connections>
@@ -527,7 +539,7 @@
                     <connections>
                         <outlet property="bubbleTable" destination="Gq2-6K-xj4" id="Qjc-fF-wWC"/>
                         <outlet property="navigationHeader" destination="EQq-BK-dxy" id="7Gt-rG-qN4"/>
-                        <outlet property="textField" destination="1dR-dm-XX0" id="OdE-o1-p4t"/>
+                        <outlet property="textField" destination="bIJ-wK-Dvy" id="qtC-4g-MrN"/>
                         <outlet property="toolbar" destination="g1N-XF-04m" id="o3S-Xs-8Ch"/>
                     </connections>
                 </viewController>
@@ -617,25 +629,25 @@
             <point key="canvasLocation" x="-1887" y="117"/>
         </scene>
     </scenes>
-<resources>
-<image name="bmatchicon" width="32" height="32"/>
-<image name="camera" width="100" height="77"/>
-<image name="chat" width="24" height="24"/>
-<image name="header" width="396" height="125"/>
-<image name="inicio" width="334" height="185"/>
-<image name="paperPlane" width="26" height="26"/>
-<image name="profile" width="32" height="32"/>
-<image name="tag" width="32" height="32"/>
-<image name="users" width="24" height="24"/>
-</resources>
-<simulatedMetricsContainer key="defaultSimulatedMetrics">
-<simulatedStatusBarMetrics key="statusBar"/>
-<simulatedOrientationMetrics key="orientation"/>
-<simulatedScreenMetrics key="destination" type="retina4"/>
-</simulatedMetricsContainer>
-<inferredMetricsTieBreakers>
-<segue reference="UlO-7K-5WJ"/>
-<segue reference="JQe-x6-210"/>
-<segue reference="ZNe-q9-fji"/>
-</inferredMetricsTieBreakers>
+    <resources>
+        <image name="bmatchicon" width="32" height="32"/>
+        <image name="camera" width="100" height="77"/>
+        <image name="chat" width="24" height="24"/>
+        <image name="header" width="396" height="125"/>
+        <image name="inicio" width="334" height="185"/>
+        <image name="paperPlane" width="26" height="26"/>
+        <image name="profile" width="32" height="32"/>
+        <image name="tag" width="32" height="32"/>
+        <image name="users" width="24" height="24"/>
+    </resources>
+    <simulatedMetricsContainer key="defaultSimulatedMetrics">
+        <simulatedStatusBarMetrics key="statusBar"/>
+        <simulatedOrientationMetrics key="orientation"/>
+        <simulatedScreenMetrics key="destination" type="retina4"/>
+    </simulatedMetricsContainer>
+    <inferredMetricsTieBreakers>
+        <segue reference="eoy-VA-AJh"/>
+        <segue reference="JQe-x6-210"/>
+        <segue reference="ZNe-q9-fji"/>
+    </inferredMetricsTieBreakers>
 </document>
