@@ -7,25 +7,13 @@
 //
 
 #import "ChatViewController.h"
-#import "UIBubbleTableView.h"
-#import "UIBubbleTableViewDataSource.h"
-#import "NSBubbleData.h"
 #import <Parse/Parse.h>
-
 
 @interface ChatViewController ()
 {
-    IBOutlet UIToolbar *toolbar;
-    IBOutlet UIBubbleTableView *bubbleTable;
-    IBOutlet UIView *textInputView;
-    //IBOutlet UITextField *textField;
     IBOutlet UINavigationItem *navigationHeader;
-    IBOutlet UITextView *textField;
-    IBOutlet UIBarButtonItem *sendButton;
-
-    NSMutableArray *bubbleData;
+    
 }
-
 @property (strong, nonatomic) PFObject* chatUser;
 
 @end
@@ -35,13 +23,28 @@
 @synthesize chat = _chat;
 @synthesize chatUser = _chatUser;
 
-- (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
-{
-    self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
-    if (self) {
-        // Custom initialization
+-(void)loadMessages{
+    self.messages = [[NSMutableArray alloc] init];
+    NSArray *users = [[NSArray alloc] initWithObjects:_chatUser, [PFUser currentUser], nil];
+    PFQuery *query = [PFQuery queryWithClassName:@"ChatMessage"];
+    [query whereKey:@"chat" equalTo:_chat];
+    [query whereKey:@"from" containedIn:users];
+    [query orderByAscending:@"createdAt"];
+    NSArray *messages = [query findObjects];
+    JSQMessage *msg;
+    
+    for (PFObject *message in messages) {
+        if([[message[@"from"] objectId] isEqualToString:[PFUser currentUser].objectId]){
+            msg = [[JSQMessage alloc] initWithText:message[@"message"] sender:self.sender date:[message createdAt]];
+            [self.messages addObject:msg];
+        }
+        else{
+            msg = [[JSQMessage alloc] initWithText:message[@"message"] sender:self.title date:[message createdAt]];
+            [self.messages addObject:msg];
+
+        }
+        
     }
-    return self;
 }
 
 - (void)viewDidLoad
@@ -49,169 +52,119 @@
     printf("\n\n HIZOOO VIEW DID LOOOAAADD!!!\n\n");
     [super viewDidLoad];
     
+    self.sender = [PFUser currentUser][@"name"];
     
-    textField.delegate = self;
-    textField.layer.borderWidth = 1.0f;
-    textField.layer.cornerRadius = 5;
-    textField.clipsToBounds = YES;
-    textField.layer.borderColor = [[UIColor lightGrayColor] CGColor];
+    self.collectionView.collectionViewLayout.incomingAvatarViewSize = CGSizeZero;
+    self.collectionView.collectionViewLayout.outgoingAvatarViewSize = CGSizeZero;
     
     // Configuración del titulo de la vista
     [_chatUser fetchIfNeeded];
     NSString *nombreCompleto = _chatUser[@"name"];
     nombreCompleto = [nombreCompleto stringByAppendingString:@" "];
     nombreCompleto = [nombreCompleto stringByAppendingString:_chatUser[@"lastName"]];
-    [navigationHeader setTitle:nombreCompleto];
+    self.title = nombreCompleto;
     
     self.hidesBottomBarWhenPushed = YES;
 
-    // Despliegue de mensajes del chat
+    /**
+     * Despliegue de mensajes del chat
+     */
+
+    [self loadMessages];
+   
+    /**
+     *  Create bubble images.
+     */
+    self.outgoingBubbleImageView = [JSQMessagesBubbleImageFactory
+                                    outgoingMessageBubbleImageViewWithColor:[UIColor jsq_messageBubbleLightGrayColor]];
     
-    bubbleData = [[NSMutableArray alloc] init];
-    PFQuery *query = [PFQuery queryWithClassName:@"ChatMessage"];
-    [query whereKey:@"chat" equalTo:_chat];
-    [query whereKey:@"from" equalTo:_chatUser];
-    NSArray *messagesForMe = [query findObjects];
-    PFQuery *query2 = [PFQuery queryWithClassName:@"ChatMessage"];
-    [query2 whereKey:@"chat" equalTo:_chat];
-    [query2 whereKey:@"to" equalTo:_chatUser];
-    NSArray *messagesFromMe = [query2 findObjects];
+    self.incomingBubbleImageView = [JSQMessagesBubbleImageFactory
+                                    incomingMessageBubbleImageViewWithColor:[UIColor jsq_messageBubbleBlueColor]];
+    /**
+     * Quitar camera
+     */
+    self.inputToolbar.contentView.leftBarButtonItem = nil;
+}
+- (void)viewWillAppear:(BOOL)animated
+{
+    [super viewWillAppear:animated];
     
-    for (PFObject *message in messagesForMe) {
-        NSBubbleData *bubble;
-        bubble = [NSBubbleData dataWithText:message[@"message"] date:[message createdAt] type:BubbleTypeSomeoneElse];
-        [bubbleData addObject:bubble];
+    if (self.delegateModal) {
+        self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemStop
+                                                                                              target:self
+                                                                                              action:@selector(closePressed:)];
     }
-    for (PFObject *message in messagesFromMe) {
-        NSBubbleData *bubble;
-        bubble = [NSBubbleData dataWithText:message[@"message"] date:[message createdAt] type:BubbleTypeMine];
-        [bubbleData addObject:bubble];
-    }
-    bubbleTable.bubbleDataSource = self;
-    
-    // The line below sets the snap interval in seconds. This defines how the bubbles will be grouped in time.
-    // Interval of 120 means that if the next messages comes in 2 minutes since the last message, it will be added into the same group.
-    // Groups are delimited with header which contains date and time for the first message in the group.
-    
-    bubbleTable.snapInterval = 86400;
-    
-    // The line below enables avatar support. Avatar can be specified for each bubble with .avatar property of NSBubbleData.
-    // Avatars are enabled for the whole table at once. If particular NSBubbleData misses the avatar, a default placeholder will be set (missingAvatar.png)
-    
-    bubbleTable.showAvatars = NO;
-    
-    // Uncomment the line below to add "Now typing" bubble
-    // Possible values are
-    //    - NSBubbleTypingTypeSomebody - shows "now typing" bubble on the left
-    //    - NSBubbleTypingTypeMe - shows "now typing" bubble on the right
-    //    - NSBubbleTypingTypeNone - no "now typing" bubble
-    
-    bubbleTable.typingBubble = NSBubbleTypingTypeNobody;
-    
-    [bubbleTable reloadData];
-    
-    // Keyboard events
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(keyboardWasShown:) name:UIKeyboardWillShowNotification object:nil];
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(keyboardWillBeHidden:) name:UIKeyboardWillHideNotification object:nil];
-    
-    [self scrollToLast];
 }
 
-- (void)didReceiveMemoryWarning
+- (void)viewDidAppear:(BOOL)animated
 {
-    [super didReceiveMemoryWarning];
-    // Dispose of any resources that can be recreated.
-}
-
-
-- (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation
-{
-    return (interfaceOrientation != UIInterfaceOrientationPortraitUpsideDown);
-}
-
-#pragma mark - UIBubbleTableViewDataSource implementation
-
-- (NSInteger)rowsForBubbleTable:(UIBubbleTableView *)tableView
-{
-    return [bubbleData count];
-}
-
-- (NSBubbleData *)bubbleTableView:(UIBubbleTableView *)tableView dataForRow:(NSInteger)row
-{
-    return [bubbleData objectAtIndex:row];
-}
-
-#pragma mark - Keyboard events
-
-- (void)keyboardWasShown:(NSNotification*)aNotification
-{
-    NSDictionary* info = [aNotification userInfo];
-    CGSize kbSize = [[info objectForKey:UIKeyboardFrameBeginUserInfoKey] CGRectValue].size;
+    [super viewDidAppear:animated];
     
-    [UIView animateWithDuration:0.2f animations:^{
-        
-        CGRect frame = toolbar.frame;
-        frame.origin.y -= kbSize.height;
-        toolbar.frame = frame;
-        
-        frame = bubbleTable.frame;
-        frame.origin.y -= kbSize.height;
-        bubbleTable.frame = frame;
-    }];
+    /**
+     *  Enable/disable springy bubbles, default is YES.
+     *  For best results, toggle from `viewDidAppear:`
+     */
+    self.collectionView.collectionViewLayout.springinessEnabled = YES;
 }
 
-- (void)keyboardWillBeHidden:(NSNotification*)aNotification
-{
-    NSDictionary* info = [aNotification userInfo];
-    CGSize kbSize = [[info objectForKey:UIKeyboardFrameBeginUserInfoKey] CGRectValue].size;
-    
-    [UIView animateWithDuration:0.2f animations:^{
-        
-        CGRect frame = toolbar.frame;
-        frame.origin.y += kbSize.height;
-        toolbar.frame = frame;
-        
-        frame = bubbleTable.frame;
-        frame.origin.y += kbSize.height;
-        bubbleTable.frame = frame;
-    }];
-}
+
 
 #pragma mark - Actions
-- (IBAction)sendMessage:(id)sender {
-    bubbleTable.typingBubble = NSBubbleTypingTypeNobody;
+
+
+#pragma mark - JSQMessagesViewController method overrides
+
+- (void)didPressSendButton:(UIButton *)button
+           withMessageText:(NSString *)text
+                    sender:(NSString *)sender
+                      date:(NSDate *)date
+{
+    /**
+     *  Sending a message. Your implementation of this method should do *at least* the following:
+     *
+     *  1. Play sound (optional)
+     *  2. Add new id<JSQMessageData> object to your data source
+     *  3. Call `finishSendingMessage`
+     */
+    [JSQSystemSoundPlayer jsq_playMessageSentSound];
     
-    NSBubbleData *sayBubble = [NSBubbleData dataWithText:textField.text date:[NSDate dateWithTimeIntervalSinceNow:0] type:BubbleTypeMine];
+    JSQMessage *message = [[JSQMessage alloc] initWithText:text sender:sender date:date];
+    [self.messages addObject:message];
+    
+    [self finishSendingMessage];
+    
+    /**
+     * Guardar mensaje en Parse
+     */
     PFObject *chatMessage = [PFObject objectWithClassName:@"ChatMessage"];
-    chatMessage[@"message"] = textField.text;
+    chatMessage[@"message"] = text;
     chatMessage[@"chat"] = _chat;
     chatMessage[@"from"] = [PFUser currentUser];
     chatMessage[@"to"] = _chatUser;
     [chatMessage saveInBackground];
-    [bubbleData addObject:sayBubble];
-    [bubbleTable reloadData];
     
+    /**
+     * Mandar notificación a Parse
+     */
     PFUser *currentUser = [PFUser currentUser];
     NSString *alert = currentUser[@"name"];
     alert = [alert stringByAppendingString:@" "];
     alert = [alert stringByAppendingString:currentUser[@"lastName"]];
     alert = [alert stringByAppendingString:@": "];
-    alert = [alert stringByAppendingString:textField.text];
-
+    alert = [alert stringByAppendingString:text];
+    
     NSDictionary *data = @{@"alert": alert,
                            @"chat": _chat.objectId,
                            @"chatUser": [PFUser currentUser].objectId,
-                           @"msg": textField.text};
+                           @"msg": text};
     PFPush *push = [[PFPush alloc] init];
     [push setChannel:_chatUser.objectId];
     [push setData:data];
     [push sendPushInBackground];
     
-    textField.text = @"";
-    [self adjustTextView];
-    [textField resignFirstResponder];
-    
-    //pongo chat activo
+    /**
+     * Poner chat activo
+     */
     PFObject *user1 = _chat[@"user1"];
     if([_chatUser.objectId isEqualToString:user1.objectId]){
         if ([_chat[@"active2"] isEqual:@NO]) {
@@ -225,8 +178,244 @@
             [_chat saveInBackground];
         }
     }
+
+}
+
+- (void)didPressAccessoryButton:(UIButton *)sender
+{
+    NSLog(@"Camera pressed!");
+    /**
+     *  Accessory button has no default functionality, yet.
+     */
+}
+
+
+
+#pragma mark - JSQMessages CollectionView DataSource
+
+- (id<JSQMessageData>)collectionView:(JSQMessagesCollectionView *)collectionView messageDataForItemAtIndexPath:(NSIndexPath *)indexPath
+{
+    return [self.messages objectAtIndex:indexPath.item];
+}
+
+- (UIImageView *)collectionView:(JSQMessagesCollectionView *)collectionView bubbleImageViewForItemAtIndexPath:(NSIndexPath *)indexPath
+{
+    /**
+     *  You may return nil here if you do not want bubbles.
+     *  In this case, you should set the background color of your collection view cell's textView.
+     */
     
-    [self scrollToLast];
+    /**
+     *  Reuse created bubble images, but create new imageView to add to each cell
+     *  Otherwise, each cell would be referencing the same imageView and bubbles would disappear from cells
+     */
+    
+    JSQMessage *message = [self.messages objectAtIndex:indexPath.item];
+    
+    if ([message.sender isEqualToString:self.sender]) {
+        return [[UIImageView alloc] initWithImage:self.outgoingBubbleImageView.image
+                                 highlightedImage:self.outgoingBubbleImageView.highlightedImage];
+    }
+    
+    return [[UIImageView alloc] initWithImage:self.incomingBubbleImageView.image
+                             highlightedImage:self.incomingBubbleImageView.highlightedImage];
+}
+
+- (UIImageView *)collectionView:(JSQMessagesCollectionView *)collectionView avatarImageViewForItemAtIndexPath:(NSIndexPath *)indexPath
+{
+    return nil;
+    /**
+     *  Return `nil` here if you do not want avatars.
+     *  If you do return `nil`, be sure to do the following in `viewDidLoad`:
+     *
+     *  self.collectionView.collectionViewLayout.incomingAvatarViewSize = CGSizeZero;
+     *  self.collectionView.collectionViewLayout.outgoingAvatarViewSize = CGSizeZero;
+     *
+     *  It is possible to have only outgoing avatars or only incoming avatars, too.
+     */
+    
+    /**
+     *  Reuse created avatar images, but create new imageView to add to each cell
+     *  Otherwise, each cell would be referencing the same imageView and avatars would disappear from cells
+     *
+     *  Note: these images will be sized according to these values:
+     *
+     *  self.collectionView.collectionViewLayout.incomingAvatarViewSize
+     *  self.collectionView.collectionViewLayout.outgoingAvatarViewSize
+     *
+     *  Override the defaults in `viewDidLoad`
+     */
+    
+    
+    //JSQMessage *message = [self.messages objectAtIndex:indexPath.item];
+    
+    //UIImage *avatarImage = [self.avatars objectForKey:message.sender];
+    //return [[UIImageView alloc] initWithImage:avatarImage];
+}
+
+- (NSAttributedString *)collectionView:(JSQMessagesCollectionView *)collectionView attributedTextForCellTopLabelAtIndexPath:(NSIndexPath *)indexPath
+{
+    /**
+     *  This logic should be consistent with what you return from `heightForCellTopLabelAtIndexPath:`
+     *  The other label text delegate methods should follow a similar pattern.
+     *
+     *  Show a timestamp for every 3rd message
+     */
+    if (indexPath.item % 3 == 0) {
+        JSQMessage *message = [self.messages objectAtIndex:indexPath.item];
+        return [[JSQMessagesTimestampFormatter sharedFormatter] attributedTimestampForDate:message.date];
+    }
+    
+    return nil;
+}
+
+- (NSAttributedString *)collectionView:(JSQMessagesCollectionView *)collectionView attributedTextForMessageBubbleTopLabelAtIndexPath:(NSIndexPath *)indexPath
+{
+    return nil;
+    //JSQMessage *message = [self.messages objectAtIndex:indexPath.item];
+    
+    /**
+     *  iOS7-style sender name labels
+     */
+    //if ([message.sender isEqualToString:self.sender]) {
+    //    return nil;
+    //}
+    
+    //if (indexPath.item - 1 > 0) {
+    //    JSQMessage *previousMessage = [self.messages objectAtIndex:indexPath.item - 1];
+    //    if ([[previousMessage sender] isEqualToString:message.sender]) {
+    //        return nil;
+    //    }
+    //}
+    
+    /**
+     *  Don't specify attributes to use the defaults.
+     */
+    //return [[NSAttributedString alloc] initWithString:message.sender];
+}
+
+- (NSAttributedString *)collectionView:(JSQMessagesCollectionView *)collectionView attributedTextForCellBottomLabelAtIndexPath:(NSIndexPath *)indexPath
+{
+    return nil;
+}
+
+#pragma mark - UICollectionView DataSource
+
+- (NSInteger)collectionView:(UICollectionView *)collectionView numberOfItemsInSection:(NSInteger)section
+{
+    return [self.messages count];
+}
+
+- (UICollectionViewCell *)collectionView:(JSQMessagesCollectionView *)collectionView cellForItemAtIndexPath:(NSIndexPath *)indexPath
+{
+    /**
+     *  Override point for customizing cells
+     */
+    JSQMessagesCollectionViewCell *cell = (JSQMessagesCollectionViewCell *)[super collectionView:collectionView cellForItemAtIndexPath:indexPath];
+    
+    /**
+     *  Configure almost *anything* on the cell
+     *
+     *  Text colors, label text, label colors, etc.
+     *
+     *
+     *  DO NOT set `cell.textView.font` !
+     *  Instead, you need to set `self.collectionView.collectionViewLayout.messageBubbleFont` to the font you want in `viewDidLoad`
+     *
+     *
+     *  DO NOT manipulate cell layout information!
+     *  Instead, override the properties you want on `self.collectionView.collectionViewLayout` from `viewDidLoad`
+     */
+    
+    JSQMessage *msg = [self.messages objectAtIndex:indexPath.item];
+    
+    if ([msg.sender isEqualToString:self.sender]) {
+        cell.textView.textColor = [UIColor blackColor];
+    }
+    else {
+        cell.textView.textColor = [UIColor whiteColor];
+    }
+    
+    cell.textView.linkTextAttributes = @{ NSForegroundColorAttributeName : cell.textView.textColor,
+                                          NSUnderlineStyleAttributeName : @(NSUnderlineStyleSingle | NSUnderlinePatternSolid) };
+    
+    return cell;
+}
+
+
+
+#pragma mark - JSQMessages collection view flow layout delegate
+
+- (CGFloat)collectionView:(JSQMessagesCollectionView *)collectionView
+                   layout:(JSQMessagesCollectionViewFlowLayout *)collectionViewLayout heightForCellTopLabelAtIndexPath:(NSIndexPath *)indexPath
+{
+    /**
+     *  Each label in a cell has a `height` delegate method that corresponds to its text dataSource method
+     */
+    
+    /**
+     *  This logic should be consistent with what you return from `attributedTextForCellTopLabelAtIndexPath:`
+     *  The other label height delegate methods should follow similarly
+     *
+     *  Show a timestamp for every 3rd message
+     */
+    if (indexPath.item % 3 == 0) {
+        return kJSQMessagesCollectionViewCellLabelHeightDefault;
+    }
+    
+    return 0.0f;
+}
+
+- (CGFloat)collectionView:(JSQMessagesCollectionView *)collectionView
+                   layout:(JSQMessagesCollectionViewFlowLayout *)collectionViewLayout heightForMessageBubbleTopLabelAtIndexPath:(NSIndexPath *)indexPath
+{
+    /**
+     *  iOS7-style sender name labels
+     */
+    JSQMessage *currentMessage = [self.messages objectAtIndex:indexPath.item];
+    if ([[currentMessage sender] isEqualToString:self.sender]) {
+        return 0.0f;
+    }
+    
+    if (indexPath.item - 1 > 0) {
+        JSQMessage *previousMessage = [self.messages objectAtIndex:indexPath.item - 1];
+        if ([[previousMessage sender] isEqualToString:[currentMessage sender]]) {
+            return 0.0f;
+        }
+    }
+    
+    return kJSQMessagesCollectionViewCellLabelHeightDefault;
+}
+
+- (CGFloat)collectionView:(JSQMessagesCollectionView *)collectionView
+                   layout:(JSQMessagesCollectionViewFlowLayout *)collectionViewLayout heightForCellBottomLabelAtIndexPath:(NSIndexPath *)indexPath
+{
+    return 0.0f;
+}
+
+- (void)collectionView:(JSQMessagesCollectionView *)collectionView
+                header:(JSQMessagesLoadEarlierHeaderView *)headerView didTapLoadEarlierMessagesButton:(UIButton *)sender
+{
+    NSLog(@"Load earlier messages!");
+}
+
+-(void)recieveMessage:(NSString *)message{
+    /**
+     *  This you should do upon receiving a message:
+     *
+     *  1. Play sound (optional)
+     *  2. Add new id<JSQMessageData> object to your data source
+     *  3. Call `finishReceivingMessage`
+     */
+    JSQMessage *recievedMessage = [[JSQMessage alloc] initWithText:message sender:self.sender date:[NSDate dateWithTimeIntervalSinceNow:0]];
+    [JSQSystemSoundPlayer jsq_playMessageReceivedSound];
+    [self.messages addObject:recievedMessage];
+    [self finishReceivingMessage];
+}
+
+-(void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event
+{
+    [self.inputToolbar.contentView.textView resignFirstResponder];
 }
 
 -(void)setChat:(PFObject *)chat{
@@ -239,68 +428,4 @@
     _chatUser = chatUser;
     NSLog(@"Chat user %@", chatUser.objectId);
 }
-
--(BOOL)textView:(UITextView *)textView shouldChangeTextInRange:(NSRange)range replacementText:(NSString *)text{
-    
-    if (textView.text.length==0 && range.length==0){
-        sendButton.enabled = YES;
-    }
-    else if (range.length==1 && textView.text.length == 1){
-        sendButton.enabled = NO;
-    }
-    
-    CGRect textFrame = textView.frame;
-    CGSize size = [textView sizeThatFits:CGSizeMake(textFrame.size.width, 70)];
-    NSInteger heightDif = size.height-textFrame.size.height;
-    if (heightDif!=0){
-        printf("hay diferencia");
-        
-        //Subir o bajar el toolbar
-        CGRect frame = toolbar.frame;
-        frame.origin.y -= heightDif;
-        //frame.size.height += heightDif;
-        toolbar.frame = frame;
-        
-        textFrame.size.height += heightDif;
-        //textFrame.origin.y -= heightDif;
-        textView.frame = textFrame;
-    }
-    return YES;
-}
-
--(void)recieveMessage:(NSString *)message{
-    NSBubbleData *sayBubble = [NSBubbleData dataWithText:message date:[NSDate dateWithTimeIntervalSinceNow:0] type:BubbleTypeSomeoneElse];
-    [bubbleData addObject:sayBubble];
-    [bubbleTable reloadData];
-    [self scrollToLast];
-}
-
--(void)scrollToLast{
-    NSInteger sections = [bubbleTable.dataSource numberOfSectionsInTableView:bubbleTable];
-    NSInteger rowsInSection = [bubbleTable.dataSource tableView:bubbleTable numberOfRowsInSection:sections-1];
-    if (sections>0 && rowsInSection>0){
-        NSIndexPath *scrollIndexPath = [NSIndexPath indexPathForRow:(rowsInSection - 1) inSection:sections-1];
-        [bubbleTable scrollToRowAtIndexPath:scrollIndexPath atScrollPosition:UITableViewScrollPositionBottom animated:YES];
-    }
-}
-
--(void)adjustTextView{
-    CGRect textFrame = textField.frame;
-    CGSize size = [textField sizeThatFits:CGSizeMake(textFrame.size.width, 70)];
-    NSInteger heightDif = size.height-textFrame.size.height;
-    if (heightDif!=0){
-        printf("hay diferencia");
-        
-        //Subir o bajar el toolbar
-        CGRect frame = toolbar.frame;
-        frame.origin.y -= heightDif;
-        //frame.size.height += heightDif;
-        toolbar.frame = frame;
-        
-        textFrame.size.height += heightDif;
-        //textFrame.origin.y -= heightDif;
-        textField.frame = textFrame;
-    }
-}
-
 @end

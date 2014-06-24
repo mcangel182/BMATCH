@@ -7,12 +7,33 @@
 //
 
 #import <UIKit/UIKit.h>
-#import "UIBubbleTableViewDataSource.h"
+#import "JSQMessages.h"
 #import <Parse/Parse.h>
 
-@interface ChatViewController : UIViewController <UIBubbleTableViewDataSource, UITextViewDelegate>
-    @property (strong, nonatomic) PFObject* chat;
-    -(void)setChat:(PFObject *)chat;
-    -(void) setChatUser:(PFObject *)chatUser;
--(void)recieveMessage:(NSString *)message;
+@class ChatViewController;
+
+
+@protocol JSQDemoViewControllerDelegate <NSObject>
+
+- (void)didDismissJSQDemoViewController:(ChatViewController *)vc;
+
+@end
+
+@interface ChatViewController : JSQMessagesViewController
+
+@property (weak, nonatomic) id<JSQDemoViewControllerDelegate> delegateModal;
+
+@property (strong, nonatomic) NSMutableArray *messages;
+@property (copy, nonatomic) NSDictionary *avatars;
+
+@property (strong, nonatomic) UIImageView *outgoingBubbleImageView;
+@property (strong, nonatomic) UIImageView *incomingBubbleImageView;
+@property (strong, nonatomic) PFObject* chat;
+
+- (void)setChat:(PFObject *)chat;
+
+- (void) setChatUser:(PFObject *)chatUser;
+
+- (void)recieveMessage:(NSString *)message;
+
 @end
