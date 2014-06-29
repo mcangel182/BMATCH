@@ -24,14 +24,14 @@
     [PFAnalytics trackAppOpenedWithLaunchOptions:launchOptions];
     //parse
     
-    printf("\n\nDID FINISHH LAUNCHIIINGGGG!!!\n\n");
+    NSLog(@"\n\nDID FINISHH LAUNCHIIINGGGG!!!\n\n");
     
     // Extract the notification data
     NSDictionary *notificationPayload = launchOptions[UIApplicationLaunchOptionsRemoteNotificationKey];
 
     if (notificationPayload) {
         if ([PFUser currentUser]) {
-            printf("\n\nDID FINISHH LAUNCHIIINGGGG2!!!\n\n");
+            NSLog(@"\n\nDID FINISHH LAUNCHIIINGGGG2!!!\n\n");
             UIStoryboard *mainStoryboard = [UIStoryboard storyboardWithName:@"Main"
                                                                      bundle: nil];
             ChatViewController *controller = (ChatViewController*)[mainStoryboard
@@ -66,47 +66,47 @@ didRegisterForRemoteNotificationsWithDeviceToken:(NSData *)deviceToken
 
 - (void)application:(UIApplication *)application
 didReceiveRemoteNotification:(NSDictionary *)userInfo {
+    NSLog(@"\n\nDID RECIEVE ROMOTE NOTIF SIN HANDLER!!!\n\n");
     [PFPush handlePush:userInfo];
+    
+    if ([PFUser currentUser]) {
+        UINavigationController *navigationController = (UINavigationController *)self.window.rootViewController;
+        
+        NSString *chatId = [userInfo objectForKey:@"chat"];
+        PFObject *chat = [PFObject objectWithoutDataWithClassName:@"Chat" objectId:chatId];
+        [chat fetchIfNeeded];
+        NSString *chatUserId = [userInfo objectForKey:@"chatUser"];
+        PFQuery *query2 = [PFUser query];
+        PFObject *chatUser = [query2 getObjectWithId:chatUserId];
+        [chatUser fetchIfNeeded];
+        
+        if ([navigationController.visibleViewController isMemberOfClass:[ChatViewController class]]){
+            NSLog(@"\n\nES UN CHAT!!!\n\n");
+            ChatViewController *chatController = navigationController.visibleViewController;
+            if ([chatController.chat.objectId isEqualToString:chat.objectId]){
+                //Ya esta cargado el chat
+                printf("\n\nES EL CHAT!!!\n\n");
+                [chatController recieveMessage:[userInfo objectForKey:@"msg"] sender:chatUser[@"name"]];
+            }
+        }
+        else{
+            UIStoryboard *mainStoryboard = [UIStoryboard storyboardWithName:@"Main"
+                                                                     bundle: nil];
+            ChatViewController *controller = (ChatViewController*)[mainStoryboard
+                                                                   instantiateViewControllerWithIdentifier: @"chatVC"];
+            [controller setChat:chat];
+            [controller setChatUser:chatUser];
+            application.applicationIconBadgeNumber = 0;
+            controller.hidesBottomBarWhenPushed = YES;
+            [navigationController pushViewController:controller animated:YES];
+        }
+    }
 }
 
 - (void)application:(UIApplication *)application
 didReceiveRemoteNotification:(NSDictionary *)userInfo
 fetchCompletionHandler:(void (^)(UIBackgroundFetchResult))handler {
-    printf("\n\nDID RECIEVE ROMOTE NOTIF!!!\n\n");
-    
-    if ([PFUser currentUser]) {
-            printf("\n\nDID RECIEVE ROMOTE NOTIF2!!!\n\n");
-            UINavigationController *navigationController = (UINavigationController *)self.window.rootViewController;
-            
-            NSString *chatId = [userInfo objectForKey:@"chat"];
-            PFObject *chat = [PFObject objectWithoutDataWithClassName:@"Chat" objectId:chatId];
-            [chat fetchIfNeeded];
-            NSString *chatUserId = [userInfo objectForKey:@"chatUser"];
-            PFQuery *query2 = [PFUser query];
-            PFObject *chatUser = [query2 getObjectWithId:chatUserId];
-            [chatUser fetchIfNeeded];
-            
-            if ([navigationController.visibleViewController isMemberOfClass:[ChatViewController class]]){
-                printf("\n\nES UN CHAT!!!\n\n");
-                ChatViewController *chatController = navigationController.visibleViewController;
-                if ([chatController.chat.objectId isEqualToString:chat.objectId]){
-                    //Ya esta cargado el chat
-                    printf("\n\nES UN CHAT2!!!\n\n");
-                    [chatController recieveMessage:[userInfo objectForKey:@"msg"]];
-                }
-            }
-            else{
-                UIStoryboard *mainStoryboard = [UIStoryboard storyboardWithName:@"Main"
-                                                                         bundle: nil];
-                ChatViewController *controller = (ChatViewController*)[mainStoryboard
-                                                                       instantiateViewControllerWithIdentifier: @"chatVC"];
-                [controller setChat:chat];
-                [controller setChatUser:chatUser];
-                application.applicationIconBadgeNumber = 0;
-                controller.hidesBottomBarWhenPushed = YES;
-                [navigationController pushViewController:controller animated:YES];
-            }
-        }
+    NSLog(@"\n\nDID RECIEVE ROMOTE NOTIF!!!\n\n");
 }
 
 - (void)applicationWillResignActive:(UIApplication *)application

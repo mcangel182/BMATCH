@@ -34,6 +34,6 @@
 
 - (void) setChatUser:(PFObject *)chatUser;
 
-- (void)recieveMessage:(NSString *)message;
+-(void)recieveMessage:(NSString *)message sender:(NSString*)sender;
 
 @end

@@ -31,6 +31,8 @@
     [query whereKey:@"from" containedIn:users];
     [query orderByAscending:@"createdAt"];
     NSArray *messages = [query findObjects];
+    
+    NSLog(@"HAAYYYYY %d",messages.count);
     JSQMessage *msg;
     
     for (PFObject *message in messages) {
@@ -399,7 +401,7 @@
     NSLog(@"Load earlier messages!");
 }
 
--(void)recieveMessage:(NSString *)message{
+-(void)recieveMessage:(NSString *)message sender:(NSString*)sender{
     /**
      *  This you should do upon receiving a message:
      *
@@ -407,7 +409,10 @@
      *  2. Add new id<JSQMessageData> object to your data source
      *  3. Call `finishReceivingMessage`
      */
-    JSQMessage *recievedMessage = [[JSQMessage alloc] initWithText:message sender:self.sender date:[NSDate dateWithTimeIntervalSinceNow:0]];
+    
+    NSLog(@"\n\n RECIEVE MESSAGE \n\n");
+    
+    JSQMessage *recievedMessage = [[JSQMessage alloc] initWithText:message sender:sender date:[NSDate dateWithTimeIntervalSinceNow:0]];
     [JSQSystemSoundPlayer jsq_playMessageReceivedSound];
     [self.messages addObject:recievedMessage];
     [self finishReceivingMessage];
